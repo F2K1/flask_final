@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div id="loginPageID">
+    <div class="container-fluid">
+
+        <form class="form" method="post" action="{{ url_for('routeToLogin') }}">
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input class="form-control" type="text" name="username" placeholder="John Doe">
+            </div>
+        
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input class="form-control" type="password" name="password" placeholder="Password">
+            </div>
+        
+            <button class="btn link_btn" type="submit">Login</button>
+        </form>
+
+        <span id="errorID">{{ error }}</span>
+    </div>
+</div>    
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}WeBlog | {{ blog[2] }} {% endblock %}
+
+{% block content %}
+<div id="viewBlogPageID container">
+    <div class="row">
+
+        <div class="col-lg-12 col-12 card">
+            <h3>{{ blog[2] }}</h3>
+            <p>{{ blog[3] }}</p>
+            <span class="date">{{ blog[4] }}</span>
+        </div>
+
+        <div class="col-lg-12 col-12">
+            <h5>Comments</h5>
+
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    
+                    <form class="form_sm" method="post" action="{{ url_for('manageComments', blog_id=blog[0]) }}">
+                        <textarea class="form-control" type="text" name="comment"  rows="7"></textarea>
+                        <button class="btn link_btn" name="actionbutton" value="addCommentID">Add</button>
+                    </form>
+                
+                </div>
+
+                {% for i in range(0, length) %}
+                <p>{{ comments_list[i][0] }}</p>
+                {% endfor %}
+
+            </div>
+
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

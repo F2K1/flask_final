@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}WeBlog | Home{% endblock %}
+
+{% block content %}
+<div id="homePageID container">
+    <div class="row">
+
+        <div class="col-lg-12 col-12 cont">
+            <div class="header">
+                <h1>Welcome to WeBlog!</h1>
+                <h3>Write, Share and Interact with the World!</h3>
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-12 cont">
+            <h3>Latest Blogs</h3>
+
+            <div class="row">
+                <div class="col-lg-4 col-12 cont">
+        
+                    {% for i in range(0, len) %}
+                    <a href="{{ url_for('routeToViewBlog', blog_id=latest_blogs_list[i][0]) }}">
+                        <div class="card snippet">
+                            <h3>{{ latest_blogs_list[i][2] }}</h3>
+                            <p>{{ latest_blogs_list[i][3] }}</p>
+                        </div>
+                    </a>
+                    <span class="date">{{ latest_blogs_list[i][4] }}</span>
+                    {% endfor %}
+                    
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

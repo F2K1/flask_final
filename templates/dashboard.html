@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}WeBlog | Admin Dashboard {% endblock %}
+
+{% block content %}
+<div id="dashboardID container">
+    <div class="row">
+
+        {% for i in range(0, len) %}
+        <div class="col-lg-2 col-1 card">
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <h5>{{ users_list[i][1] }}</h5>
+                </div>
+
+                    <form class="col-lg-6 form_sm" method="post" action="{{ url_for('manageUsers') }}">
+                        <input hidden class="form-control" type="text" name="userid" value="{{ users_list[i][0] }}">
+                        <button style="margin-bottom: 1rem;" class="btn link_btn" name="actionbutton" value="blockUser">Block</button>
+                        <button style="margin-bottom: 1rem;" class="btn link_btn" name="actionbutton" value="unblockUser">Unblock</button>
+                        <button style="margin-bottom: 1rem;" class="btn link_btn" name="actionbutton" value="setasAuthor">Set as Author</button>
+                        <button style="margin-bottom: 1rem;" class="btn link_btn" name="actionbutton" value="unsetasAuthor">Unset as Author</button>
+                    </form>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

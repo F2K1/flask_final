@@ -1,0 +1,84 @@
+body {
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+}
+
+.card {
+  cursor: pointer;
+  padding: 1.5rem;
+}
+.card > p {
+  text-align: left;
+}
+
+.comments {
+  color: rgb(249, 74, 41);
+  text-align: left;
+}
+
+.cont {
+  padding: 0 2rem;
+}
+
+.blockcontent {
+  margin: 3rem 0;
+}
+
+.date {
+  text-align: right;
+}
+
+.footer {
+  background-color: rgb(249, 74, 41);
+  margin: 2rem 0 0 0;
+  text-align: center;
+}
+
+.form {
+  margin: 0 38rem;
+}
+.form > :not(button) {
+  text-align: left;
+}
+.form_sm {
+  margin: 2rem;
+}
+
+.header {
+  margin-bottom: 12rem;
+}
+
+.link_btn {
+  border-radius: 0.4rem;
+}
+
+.navbar {
+  background-color: rgb(214, 19, 85);
+  margin: 0 0 2rem 0;
+}
+.navbar > .container-fluid {
+  justify-content: center;
+}
+.navbar_groupR {
+  margin-left: auto;
+}
+
+.snippet {
+  height: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: wrap;
+}
+
+.clr_combo_prim, .link_btn {
+  background-color: rgb(214, 19, 85);
+  color: rgb(252, 226, 42);
+}
+.clr_combo_prim:hover, .link_btn:hover {
+  background-color: rgb(252, 226, 42);
+  color: rgb(214, 19, 85);
+}/*# sourceMappingURL=styles.css.map */

@@ -1,0 +1,113 @@
+// Variables
+$clr_prim: rgb(214, 19, 85);
+$clr_sec: rgb(252, 226, 42);
+$clr_ter: rgb(249, 74, 41);
+$clr_quat: rgb(48, 227, 223);
+
+$corner: 0.4rem;
+
+
+// Tags
+body {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+}
+
+
+// Mixins
+
+
+// Classes
+.card {
+    cursor: pointer;
+    padding: 1.5rem;
+
+    &>p {
+        text-align: left;
+    }
+}
+
+.comments {
+    color: $clr_ter;
+    text-align: left;
+}
+
+.cont {
+    padding: 0 2rem;
+}
+
+.blockcontent {
+    margin: 3rem 0;
+}
+
+.date {
+    text-align: right;
+}
+
+.footer {
+    background-color: $clr_ter;
+    margin: 2rem 0 0 0;
+    text-align: center;
+}
+
+.form {
+    margin: 0 38rem;
+
+    &>:not(button) {
+        text-align: left;
+    }
+
+    &_sm {
+        margin: 2rem;
+    }
+}
+
+.header {
+    margin-bottom: 12rem;
+}
+
+.link_btn {
+    @extend .clr_combo_prim;
+
+    border-radius: $corner;
+}
+
+.navbar {
+    background-color: $clr_prim;
+    margin: 0 0 2rem 0;
+
+    &>.container-fluid {
+        justify-content: center;
+    }
+
+    // &_groupC {
+
+    // }
+
+    &_groupR {
+        margin-left: auto;
+    }
+}
+
+.snippet {
+    height: 20rem; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    white-space: wrap; 
+}
+
+.clr_combo { //dominant
+    &_prim {
+        background-color: $clr_prim;
+        color: $clr_sec;
+        
+        &:hover {
+            background-color: $clr_sec;
+            color: $clr_prim;
+        }
+    }
+}

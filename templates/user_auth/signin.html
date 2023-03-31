@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Signin{% endblock %}
+
+{% block content %}
+<div id="signinPageID">
+    <div class="container-fluid">
+
+        <form class="form" method="post" action="{{ url_for('routeToSignin') }}">
+            <div class="mb-3">
+              <label class="form-label">Username</label>
+              <input class="form-control" type="text" name="username" placeholder="JDoe">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input class="form-control" type="text" name="firstname" placeholder="John">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input class="form-control" type="text" name="lastname" placeholder="Don">
+            </div>
+  
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input class="form-control" type="email" name="email" placeholder="example@example.com">
+            </div>
+        
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input class="form-control" type="password" name="password" placeholder="Password">
+            </div>
+        
+            <button class="btn link_btn" type="submit">Signin</button>
+        </form>
+
+        <span id="errorID">{{ error }}</span>
+    </div>
+</div>    
+{% endblock %}
