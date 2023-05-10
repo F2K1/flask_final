@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}WeBlog | "{{ username }}" Profile {% endblock %}
+{% block title %}WeBlog | Profile {% endblock %}
 
 {% block content %}
 <div id="profilePageID">
@@ -43,13 +43,14 @@
                         <textarea class="form-control" type="text" name="content" rows="7"> {{ blogs_list[i][3] }} </textarea>
                     </div>
                 
-                    <button class="btn link_btn" type="submit" name="actionbutton" value="updateFormID">Update</button>
-
                     <div class="mb-3">
                         <input class="form-control" hidden type="text" name="blogid" value="{{ blogs_list[i][0] }}">
                     </div>
                                       
-                    <button class="btn link_btn" type="submit" name="actionbutton" value="deleteFormID">Delete</button>  
+                    <div style="display: inline-block;">
+                        <button class="btn link_btn" type="submit" name="actionbutton" value="updateFormID">Update</button>
+                        <button class="btn link_btn" type="submit" name="actionbutton" value="deleteFormID">Delete</button>  
+                    </div>
                 </form>
             </div>
             {% endfor %}
@@ -57,5 +58,6 @@
         </div>        
     </div>
 
-</div>    
+</div>
+
 {% endblock %}

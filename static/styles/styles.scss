@@ -84,12 +84,29 @@ a {
         justify-content: center;
     }
 
-    // &_groupC {
-
-    // }
-
     &_groupR {
         margin-left: auto;
+    }
+}
+
+.ham_menu {
+    background-color: $clr_prim;
+    border-radius: $corner;
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 7%;
+    width: 10%;
+    
+    &>* {
+        display: block;
+    }
+
+    &>i {
+        color: $clr_sec;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.3rem; 
     }
 }
 

@@ -1,246 +1,137 @@
-from flask import Flask, render_template, request, session, redirect, url_for, g
-import sqlite3
+from flask import Flask, render_template, redirect, url_for, request
+import repository
 from datetime import datetime
 
 
+#session setup
 app = Flask(__name__)
 app.secret_key = 'jiejfirjeijrrcm4334qjdwx293r82ud2few2ed' #bad practice
 app.config['SESSION_TYPE'] = 'filesystem'
 
-
-# Database Setup (here bad practice)
-def connectDb():
-    conn = sqlite3.connect("blog.db")
-    return conn
-
-def createTables():
-    db = connectDb()
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS users
-        (userID INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        firstname TEXT NOT NULL,
-        lastname TEXT NOT NULL,
-        email TEXT NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT NOT NULL,
-        blocked INTEGER NOT NULL)
-    """)
-    db.commit
-
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS blogs
-        (blogID INTEGER PRIMARY KEY AUTOINCREMENT,
-        userID INTEGER,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        date TEXT NOT NULL,
-        FOREIGN KEY(userID) REFERENCES users(userID))
-    """)
-    db.commit
-
-    db.execute("""
-        CREATE TABLE IF NOT EXISTS comments
-        (commentID INTEGER PRIMARY KEY AUTOINCREMENT,
-        userID INTEGER,
-        blogID INTEGER,
-        text TEXT NOT NULL,
-        date TEXT NOT NULL,
-        FOREIGN KEY(userID) REFERENCES users(userID),
-        FOREIGN KEY(blogID) REFERENCES blogs(blogID))
-    """)
-    db.commit
-
-createTables() #creates the database
-
-def checkUser():
-    user_id = session.get("user_id")
-    if user_id == None:
-        g.user = None
-    else:
-        db = connectDb()
-        g.user = db.execute("SELECT * FROM users WHERE userID=?", (user_id,)).fetchone()
-
-
+#redirect to home page
 @app.route("/")
 def routeToHome(latest_blogs_list=None):
-    db = connectDb()
-    latest_blogs_list = db.execute("SELECT * FROM blogs ORDER BY date ASC")
-    latest_blogs_list = db.execute("SELECT * FROM blogs").fetchall()
-    return render_template("index.html", len=len(latest_blogs_list), latest_blogs_list=latest_blogs_list)
+    latest_blogs_list = repository.getLatestBlogs(latest_blogs_list)
+    isSession = repository.checkUser()
+    return render_template("index.html", isSession=isSession, len=len(latest_blogs_list), latest_blogs_list=latest_blogs_list)
 
+#redirect to user profile page
 @app.route("/profile")
 def routeToProfile(blogs_list=None):
-    checkUser()
-    if g.user == None:
+    blogs_list = repository.getUsersBlogs(blogs_list)
+    isSession = repository.checkUser()
+
+    if blogs_list == None:
         return redirect(url_for("routeToLogin"))
     else:
-        db = connectDb()
-        blogs_list = db.execute("SELECT * FROM blogs WHERE userID=?", (g.user[0],)).fetchall()
-        return render_template("profile.html", username=g.user[1], role=g.user[6], len=len(blogs_list), blogs_list=blogs_list)
+        return render_template("profile.html", isSession=isSession, username=blogs_list[1], role=blogs_list[2], len=len(blogs_list[0]), blogs_list=blogs_list[0])
 
+#redirect to individual blog page
 @app.route("/view-blog/<blog_id>")
 def routeToViewBlog(blog_id):
-    db = connectDb()
-    blog = db.execute("SELECT * FROM blogs WHERE blogID=?", (blog_id,)).fetchone()
-    comments_list = db.execute("SELECT text FROM comments WHERE blogID=?", (blog_id,)).fetchall()
-    return render_template("view_blog.html", blog=blog, length=len(comments_list), comments_list=comments_list)
+    blog_id = repository.getBlogDetails(blog_id)
+    isSession = repository.checkUser()
+    return render_template("view_blog.html", isSession=isSession, blog=blog_id[0], length=len(blog_id[1]), comments_list=blog_id[1])
 
+
+#redirect to admin dashboard
 @app.route("/dashboard")
 def routeToDashboard():
-    db = connectDb()
-    checkUser()
-    users_list = db.execute("SELECT userID, username FROM users WHERE userID!=1").fetchall()
-    return render_template("dashboard.html", len=len(users_list), users_list=users_list, user=g.user)
+    data = repository.getUsers()
+    return render_template("dashboard.html", len=len(data[0]), users_list=data[0], user=data[1])
 
-
-# Admin Dashboard
+#admin dashboard
 @app.route("/manageUsers", methods=["POST"])
 def manageUsers():
-    checkUser()
+    repository.checkUser()
     if request.form["actionbutton"] == "blockUser":
-        error = None
-
         userid = request.form["userid"]
-
-        db = connectDb()
-        db.execute("UPDATE users SET blocked=1 WHERE userID=?", (userid,))
-        db.commit()
-        return redirect(url_for("routeToDashboard", user=g.user))
+        data = repository.blockUser(userid)
+        return redirect(url_for("routeToDashboard", user=data))
     
     elif request.form["actionbutton"] == "unblockUser":
         userid = request.form["userid"]
-
-        db = connectDb()
-        db.execute("UPDATE users SET blocked=0 WHERE userID=?", (userid,))
-        db.commit()
-        return redirect(url_for("routeToDashboard", user=g.user))
+        data = repository.unblockUser(userid)
+        return redirect(url_for("routeToDashboard", user=data))
 
     elif request.form["actionbutton"] == "setasAuthor":
         userid = request.form["userid"]
-
-        db = connectDb()
-        db.execute("UPDATE users SET role='author' WHERE userID=?", (userid,))
-        db.commit()
-        return redirect(url_for("routeToDashboard", user=g.user))
+        data = repository.setasAuthor(userid)
+        return redirect(url_for("routeToDashboard", user=data))
 
     elif request.form["actionbutton"] == "unsetasAuthor":
         userid = request.form["userid"]
-
-        db = connectDb()
-        db.execute("UPDATE users SET role='user' WHERE userID=?", (userid,))
-        db.commit()
-        return redirect(url_for("routeToDashboard", user=g.user))
+        data = repository.unsetasAuthor(userid)
+        return redirect(url_for("routeToDashboard", user=data))
 
 
-# Comments CRUD
+#user comment dashboard
 @app.route("/manageComments/<blog_id>", methods=["POST"])
 def manageComments(blog_id):
-    if request.form["actionbutton"] == "addCommentID":
-        error = None
-        
+    repository.checkUser()
+    if request.form["actionbutton"] == "addCommentID":        
         comment = request.form["comment"]
         date = (datetime.now()).strftime("%d/%m/%Y %H:%M:%S")
-
-        checkUser()
-
-        db = connectDb()
-        db.execute("INSERT INTO comments(userID, blogID, text, date) VALUES(?, ?, ?, ?)", (g.user[0], blog_id, comment, date))
-        db.commit()
-
+        blog_id = repository.addComment(blog_id, comment, date)
         return redirect(url_for("routeToViewBlog", blog_id=blog_id))
 
 
-# Blog CRUD
+#manage user blogs
 @app.route("/manageBlogs", methods=["POST"])
 def manageBlogs():
+    repository.checkUser()
     if request.form["actionbutton"] == "addFormID":
-        error = None
-
         title = request.form["title"]
         content = request.form["content"]
         date = (datetime.now()).strftime("%d/%m/%Y %H:%M:%S")
-
-        checkUser()
-
-        db = connectDb()
-        db.execute("INSERT INTO blogs(userID, title, content, date) VALUES(?, ?, ?, ?)", (g.user[0], title, content, date))
-        db.commit()
-
-        return redirect(url_for("routeToProfile", user=g.user))
+        data = repository.addBlog(title, content, date)
+        return redirect(url_for("routeToProfile", user=data))
 
     elif request.form["actionbutton"] == "updateFormID":
-        error = None
-
         blogid = request.form["blogid"]
         title = request.form["title"]
         content = request.form["content"]
         date = (datetime.now()).strftime("%d/%m/%Y %H:%M:%S")
-
-        checkUser()
-
-        db = connectDb()
-        db.execute("UPDATE blogs SET userID=?, title=?, content=?, date=? WHERE blogID=?", (g.user[0], title, content, date, blogid))
-        db.commit()
-
-        return redirect(url_for("routeToProfile", user=g.user))
+        data = repository.updateBlog(blogid, title, content, date)
+        return redirect(url_for("routeToProfile", user=data))
 
     elif request.form["actionbutton"] == "deleteFormID":
-        error = None
         blogid = request.form["blogid"]
+        data = repository.deleteBlog(blogid)
+        return redirect(url_for("routeToProfile", user=data))
 
-        db = connectDb()
-        db.execute("DELETE FROM blogs WHERE blogID=?", (blogid))
-        db.commit()
 
-        return redirect(url_for("routeToProfile", user=g.user))
-    
-
-# User Authentication & Registration
-#login
+#redirect to login page
 @app.route("/login", methods=["POST", "GET"])
 def routeToLogin():
+    isSession = repository.checkUser()
     if request.method == "POST":
         error = None
 
         username = request.form["username"]
         password = request.form["password"]
 
-        db = connectDb()
-        user = db.execute('SELECT * FROM users WHERE username=?', (username,)).fetchone()
+        data = repository.login(error, username, password)
 
-        if user == None:
-            error = "User doesn't exist! Please create an account to continue!"
-            return redirect(url_for("routeToSignin")), render_template("user_auth/signin.html", error=error)
- 
-        elif password != user[5]:
-            error = "Invalid Credentials!"
-            return render_template("user_auth/login.html", error=error)
-        
-        elif user[7] == 1:
-            error = "This account has been blocked!"
-            return render_template("user_auth/login.html", error=error)
+        if data[0] != None:
+            return render_template("user_auth/login.html", isSession=isSession, error=data[0])
+        elif data[1] == "admin":
+            return redirect(url_for("routeToDashboard"))
+        elif data[1] == "notadmin":
+            return redirect(url_for("routeToProfile"))
 
-        else:
-            session.clear()
-            session["user_id"] = user[0]
-            if user[6] == "admin":
-                return redirect(url_for("routeToDashboard"))
-            
-            else:
-                return redirect(url_for("routeToProfile"))
-                    
-    return render_template("user_auth/login.html")
+    return render_template("user_auth/login.html", isSession=isSession)
 
-#logout
+#logout user
 @app.route("/logout")
 def routeToLogout():
-    session.clear()
+    repository.logout()
     return redirect(url_for("routeToHome"))
 
-#signin
+#redirect to signin page 
 @app.route("/signin", methods=["POST", "GET"])
 def routeToSignin():
+    isSession = repository.checkUser()
     if request.method == "POST":
         error = None
 
@@ -250,19 +141,13 @@ def routeToSignin():
         email = request.form["email"]
         password = request.form["password"]
 
-        db = connectDb()
-        usernames_list = db.execute("SELECT username FROM users").fetchall()
-
-        if username in usernames_list:
-            error = "Username Taken! Please select another username."
-            return render_template("user_auth/signin.html", error=error)
-        
+        data = repository.signin(error, username, firstname, lastname, email, password)
+        if data[0] != None:
+            render_template("user_auth/signin.html", isSession=isSession, error=data)
         else:
-            db.execute("INSERT INTO users(username, firstname, lastname, email, password, role, blocked) VALUES(?, ?, ?, ?, ?, 'user', 0)", (username, firstname, lastname, email, password))
-            db.commit()
-            return redirect(url_for("routeToLogin"))
+            redirect(url_for("routeToLogin"))
         
-    return render_template("user_auth/signin.html")
+    return render_template("user_auth/signin.html", isSession=isSession)
 
 
 if __name__ == "__main__":

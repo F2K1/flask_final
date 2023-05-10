@@ -13,6 +13,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;500;900&display=swap" rel="stylesheet">
         <!-- Bootstrap 5 CDN -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <!-- Lineicon CDN -->
+        <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet">
         <!-- SCSS -->
         <link type="text/css" rel="stylesheet" href="../static/styles/styles.css">
     </head>
@@ -25,13 +27,29 @@
               <div class="navbar_groupR">
                 <a href="{{ url_for('routeToHome') }}" class="btn link_btn">Home</a>
                 <a href="{{ url_for('routeToProfile') }}" class="btn link_btn">Profile</a>
+                {% if isSession == "no" %}
                 <a href="{{ url_for('routeToLogin') }}" class="btn link_btn">Login</a>
                 <a href="{{ url_for('routeToSignin') }}" class="btn link_btn">Signin</a>
+                {% else %}
                 <a href="{{ url_for('routeToLogout') }}" class="btn link_btn">Logout</a>
+                {% endif %}
+                <button id="hamMenu" class="btn link_btn" onclick="showHamMenu('show')"> <i class="lni lni-menu"></i> </button>
               </div>
 
             </div>
         </nav>
+
+        <div class="ham_menu">
+          <i class="lni lni-close" onclick="showHamMenu()"></i>
+          <a href="{{ url_for('routeToHome') }}" class="btn link_btn">Home</a>
+          <a href="{{ url_for('routeToProfile') }}" class="btn link_btn">Profile</a>
+          {% if isSession == "no" %}
+          <a href="{{ url_for('routeToLogin') }}" class="btn link_btn">Login</a>
+          <a href="{{ url_for('routeToSignin') }}" class="btn link_btn">Signin</a>
+          {% else %}
+          <a href="{{ url_for('routeToLogout') }}" class="btn link_btn">Logout</a>
+          {% endif %}
+        </div>
 
 
         <!--Body Content-->
@@ -46,6 +64,6 @@
           WeBlog &copy: 2023. All Rights Reserved.
         </footer>
 
-        <script src="../static/dynamics/index.js" async defer></script>
+        <script src="../static/dynamics/index.js"></script>
     </body>
 </html>
